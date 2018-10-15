@@ -1,20 +1,21 @@
 class Node:
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, val):
+        self.val = val
         self.next = None
+
+
 
 
 class LinkedList:
     def __init__(self):
-        self.tail = None
+        self.head = None
         self.guard = Node(None)
-        self.head = self.guard.next
         self.current = self.guard
 
-    def printlist(self):
-        node = self.guard.next
+    def printlist(self, node):
+        # node = self.guard.next
         while node is not None:
-            print(node.value)
+            print(node.val)
             node = node.next
 
     def add(self, data):
@@ -48,11 +49,11 @@ class LinkedList:
         self.head = self.guard.next
         if self.head is None:
             return list
-        node = Node(self.head.value)
+        node = Node(self.head.val)
         list.current = node
         node1 = self.head.next
         while node1 is not None:
-            node = Node(node1.value)
+            node = Node(node1.val)
             node.next = list.current
             list.current = node
             node1 = node1.next
@@ -61,26 +62,42 @@ class LinkedList:
         return list
 
     @classmethod
-    def merge(self, list1, list2):
-        list1.head = list1.guard.next
-        list2.head = list2.guard.next
-        node1 = list1.head
-        node2 = list2.head
-        list = LinkedList()
-        list.current = list.guard
+    def merge(self, l1, l2):
+        if l1 is None:
+            return l2
+        if l2 is None:
+            return l1
+        node1 = l1
+        node2 = l2
+        node = Node(0)
+        head = node
         while node1 is not None and node2 is not None:
-            if node1.value < node2.value:
-                list.current.next = node1
+            if node1.val < node2.val:
+                node.next = node1
                 node1 = node1.next
             else:
-                list.current.next = node2
+                node.next = node2
                 node2 = node2.next
-            list.current = list.current.next
+            node = node.next
         if node1 is not None:
-            list.current.next = node1
+            node.next = node1
         elif node2 is not None:
-            list.current.next = node2
-        return list
+            node.next = node2
+        return head.next
+
+    @classmethod
+    def mergeRecursive(self, l1, l2):
+        if l1 is None:
+            return l2
+        if l2 is None:
+            return l1
+        if l1.val < l2.val:
+            l1.next = self.mergeRecursive(l1.next, l2)
+            return l1
+        else:
+            l2.next = self.mergeRecursive(l1, l2.next)
+            return l2
+
 
     def mid(self):
         self.head = self.guard.next
@@ -93,22 +110,38 @@ class LinkedList:
             slow = slow.next
         return slow
 
-    def deleteReverseN(self, n):
-        node = self.guard
+    def removeNthFromEnd(self, head, n):
+        if head is None or head.next is None:
+            return None
+
+        node = head
         count = 0
-        while node.next is not None:
+
+        while node is not None:
             count += 1
             node = node.next
         if n > count:
-            return Node(0)
-        node = self.guard
+            return head
+        node = head
         index = 0
         while index < count-1-n:
             node = node.next
             index += 1
-        delete = node.next
         node.next = node.next.next
-        return delete
+        return head
+
+    def removeNthFromEndArray(self, head, n):
+        if head is None:
+            return head
+        node = head
+        nodeArr = []
+
+        while node is not None:
+            nodeArr.append(node)
+            node = node.next
+        node = nodeArr[len(nodeArr) - n - 1]
+        node.next = node.next.next
+        return head
 
     def circleDetect(self):
         self.head = self.guard.next
@@ -123,28 +156,35 @@ class LinkedList:
 
 
 if __name__ == '__main__':
-    list1 = LinkedList()
-    list1.add(1)
-    list1.add(2)
-    list1.add(4)
-    list1.printlist()
+    l1 = LinkedList()
+    l1.add(1)
+    l1.add(2)
+    l1.add(4)
+    l1.head = l1.guard.next
+    l1.printlist(l1.head)
     print('-----------')
-    list2 = LinkedList()
-    list2.add(1)
-    list2.add(3)
-    list2.add(4)
-    list2.printlist()
+    l2 = LinkedList()
+    l2.add(1)
+    l2.add(3)
+    l2.add(4)
+    l2.head = l2.guard.next
+    l2.printlist(l2.head)
     print('-----------')
-    list = LinkedList.merge(list1, list2)
-    list.printlist()
+    # head = LinkedList.merge(l1.guard.next, l2.guard.next)
+    head = LinkedList.mergeRecursive(l1.guard.next, l2.guard.next)
+    list = LinkedList()
+    list.guard.next = head
+    list.printlist(head)
     print('-----------')
+    list.removeNthFromEndArray(list.guard.next, 2)
+    list.printlist(head)
     # node = list.mid()
-    # print(node.value)
+    # print(node.val)
     # list2 = list.reverseList()
     # list2.printlist()
     # print('-----------')
     # node = list.deleteReverseN(6)
-    # print(node.value)
+    # print(node.val)
     # print('-----------')
     # list.gettail()
     # list.tail.next = list.head

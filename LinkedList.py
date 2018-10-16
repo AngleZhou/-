@@ -1,4 +1,4 @@
-class Node:
+class ListNode:
     def __init__(self, val):
         self.val = val
         self.next = None
@@ -9,7 +9,7 @@ class Node:
 class LinkedList:
     def __init__(self):
         self.head = None
-        self.guard = Node(None)
+        self.guard = ListNode(None)
         self.current = self.guard
 
     def printlist(self, node):
@@ -19,7 +19,7 @@ class LinkedList:
             node = node.next
 
     def add(self, data):
-        newNode = Node(data)
+        newNode = ListNode(data)
         self.current.next = newNode
         self.current = newNode
 
@@ -44,22 +44,38 @@ class LinkedList:
         self.head = node1
         self.tail.next = None
 
-    def reverseList(self):
-        list = LinkedList()
-        self.head = self.guard.next
-        if self.head is None:
-            return list
-        node = Node(self.head.val)
-        list.current = node
-        node1 = self.head.next
-        while node1 is not None:
-            node = Node(node1.val)
-            node.next = list.current
-            list.current = node
-            node1 = node1.next
-        list.head = list.current
-        list.guard.next = list.head
-        return list
+    def reverseList(self, head):
+        if head is None or head.next is None:
+            return head
+        node1 = ListNode(head.val)
+        while head.next:
+            node2 = ListNode(head.next.val)
+            node2.next = node1
+            node1 = node2
+            head = head.next
+        return node1
+
+    def reverseList2(self, head):
+        pre = None
+        cur = head
+        while cur:
+            tmp = cur.next
+            cur.next = pre
+            pre = cur
+            cur = tmp
+        return cur
+
+    def reverseR(self, head):
+        (newHead, pre) = self.reverseListRecursive(head)
+        return newHead
+
+    def reverseListRecursive(self, head):
+        if head is None or head.next is None:
+            return head, head
+        newHead, node = self.reverseListRecursive(head.next)
+        head.next = None
+        node.next = head
+        return newHead, head
 
     @classmethod
     def merge(self, l1, l2):
@@ -69,7 +85,7 @@ class LinkedList:
             return l1
         node1 = l1
         node2 = l2
-        node = Node(0)
+        node = ListNode(0)
         head = node
         while node1 is not None and node2 is not None:
             if node1.val < node2.val:
@@ -99,35 +115,27 @@ class LinkedList:
             return l2
 
 
-    def mid(self):
-        self.head = self.guard.next
-        if self.head is None:
-            return Node(0)
-        fast = self.head
-        slow = self.head
-        while fast.next is not None and fast.next.next is not None:
+    def mid(self, head):
+        if head is None:
+            return head
+        fast = slow = head
+        while fast.next and fast.next.next:
             fast = fast.next.next
             slow = slow.next
-        return slow
+        if not fast.next:
+            return slow
+        return slow.next
 
     def removeNthFromEnd(self, head, n):
-        if head is None or head.next is None:
-            return None
-
-        node = head
-        count = 0
-
-        while node is not None:
-            count += 1
-            node = node.next
-        if n > count:
-            return head
-        node = head
-        index = 0
-        while index < count-1-n:
-            node = node.next
-            index += 1
-        node.next = node.next.next
+        fast = slow = head
+        for _ in range(n):
+            fast = fast.next
+        if not fast:
+            return head.next
+        while fast.next:
+            fast = fast.next
+            slow = slow.next
+        slow.next = slow.next.next
         return head
 
     def removeNthFromEndArray(self, head, n):
@@ -143,15 +151,13 @@ class LinkedList:
         node.next = node.next.next
         return head
 
-    def circleDetect(self):
-        self.head = self.guard.next
-        fast = self.head
-        slow = self.head
-        while fast is not None and fast.next is not None:
-            if fast == slow:
-                return True
+    def has_cycle(self, head):
+        fast = slow = head
+        while fast and fast.next:
             fast = fast.next.next
             slow = slow.next
+            if fast == slow:
+                return True
         return False
 
 
@@ -169,20 +175,37 @@ if __name__ == '__main__':
     l2.add(4)
     l2.head = l2.guard.next
     l2.printlist(l2.head)
-    print('-----------')
-    # head = LinkedList.merge(l1.guard.next, l2.guard.next)
-    head = LinkedList.mergeRecursive(l1.guard.next, l2.guard.next)
+    print('------ merge -----')
+    head = LinkedList.mergeRecursive(l1.head, l2.head)
     list = LinkedList()
     list.guard.next = head
     list.printlist(head)
     print('-----------')
-    list.removeNthFromEndArray(list.guard.next, 2)
-    list.printlist(head)
-    # node = list.mid()
-    # print(node.val)
-    # list2 = list.reverseList()
-    # list2.printlist()
-    # print('-----------')
+    print('----- has_cycle ------')
+    # list.gettail()
+    # list.tail.next = head
+    print(list.has_cycle(head))
+    print('-----------')
+    print('----- removeNthFromEnd ------')
+    # l1.removeNthFromEnd(None, 0)
+    # l1.printlist(l1)
+    print('-----------')
+    print('------ mid -----')
+    node = list.mid(head)
+    print(node.val)
+    print('-----------')
+    print('------ reverse -----')
+    l4 = LinkedList()
+    l4.add(1)
+    l4.add(2)
+    l4.add(4)
+    l4.head = l4.guard.next
+    l4.printlist(l4.head)
+    print('--')
+    # ret = l4.reverseR(l4.head)
+    ret = l4.reverseList(l4.head)
+    l4.printlist(ret)
+
     # node = list.deleteReverseN(6)
     # print(node.val)
     # print('-----------')
